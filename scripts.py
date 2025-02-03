@@ -37,13 +37,37 @@ def save_courses(data):
         if course == 'complex':
             continue
         for group_name, url in groups.items():
+            date, time = now_time()  # Обновляем время для каждой группы
+            timestamp = f"{date} {time}"
             SQL_request("""
-                INSERT INTO groups (complex, name, url, course)
-                VALUES (?, ?, ?, ?)
+                INSERT INTO groups (complex, name, url, course, time_add)
+                VALUES (?, ?, ?, ?, ?)
                 ON CONFLICT(name) DO UPDATE SET
                     complex = excluded.complex,
                     url = excluded.url,
-                    course = excluded.course
-            """, (data['complex'], group_name, url, course))
+                    course = excluded.course,
+                    time_add = excluded.time_add  -- Обновляем время добавления
+            """, (data['complex'], group_name, url, course, timestamp))
+
+def save_schedule(data):
+    week = data["week"]
+    group = data["group"]
+    new_data = data.copy()
+    del new_data["week"]
+    del new_data["group"]
+    group = group.replace("-", "_")
+    create_db.create_group(group)
+    data = new_data
+    date, time = now_time()  # Обновляем время для каждой группы
+    timestamp = f"{date} {time}"
+    SQL_request(f"""
+        INSERT INTO {group} (week, data, time_add)
+        VALUES (?, ?, ?)
+        ON CONFLICT(week) DO UPDATE SET
+            week = excluded.week,
+            time_add = excluded.time_add
+    """, (week, json.dumps(data), timestamp))
+
+
 
 import create_db
