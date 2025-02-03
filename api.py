@@ -41,7 +41,7 @@ def save_groups():
     return jsonify(text), code
 
 @Blueprint.route('/save_schedule', methods=['POST'])
-def get_schedule():
+def send_schedule():
     text, code = saves(save_schedule, request)
     return jsonify(text), code
 
