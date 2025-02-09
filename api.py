@@ -2,6 +2,8 @@ from flask import Flask, jsonify, Blueprint, request, abort
 import config
 from scripts import *
 
+VERSION = "1.0.0"
+
 Blueprint = Blueprint(
     "api",
     __name__,
