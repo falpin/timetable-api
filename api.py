@@ -16,7 +16,7 @@ def check_api_key(api_key):
     if api_key not in ALLOWED_API_KEYS:
         abort(401, description="Неверный API ключ")  # Возвращает 401 Unauthorized если ключ недействителен
 
-def saves(function, request):
+def save_data(function, request):
     try:
         api_key = request.headers.get('X-API-Key')
         check_api_key(api_key)
@@ -36,14 +36,25 @@ def example():
     return jsonify({"message": "API Работает"}), 200
 
 @Blueprint.route('save_groups', methods=['POST'])
-def save_groups():
-    text, code = saves(save_courses, request)
+def saving_groups():
+    text, code = save_data(save_groups, request)
     return jsonify(text), code
 
 @Blueprint.route('/save_schedule', methods=['POST'])
-def send_schedule():
-    text, code = saves(save_schedule, request)
+def saving_schedule():
+    text, code = save_data(save_schedule, request)
     return jsonify(text), code
+
+@Blueprint.route('get_groups', methods=['GET', 'POST'])
+def get_groups():
+    if request.method == "GET":
+        group = None
+    elif request.method == "POST":
+        data = request.get_json()
+        group = data['group']
+    groups, code = find_groups(group)
+    return jsonify(groups), code
+
 
 if __name__ == '__main__':
     app = Flask(__name__)

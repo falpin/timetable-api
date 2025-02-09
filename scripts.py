@@ -1,12 +1,9 @@
 import json
 from datetime import datetime
 import pytz
-import sqlite3
 import os
 import re
-
-DB_NAME = 'database.db'
-DB_PATH = f"{DB_NAME}"
+from use_db import *
 
 
 def now_time():  # Получение текущего времени по МСК
@@ -17,22 +14,7 @@ def now_time():  # Получение текущего времени по МС�
     current_date = now_moscow.strftime("%Y.%m.%d")
     return current_date, current_time
 
-
-def SQL_request(request, params=(), all_data=None):  # Выполнение SQL-запросов
-    connect = sqlite3.connect(DB_PATH)
-    cursor = connect.cursor()
-    if request.strip().lower().startswith('select'):
-        cursor.execute(request, params)
-        if all_data == None: result = cursor.fetchone()
-        else: result = cursor.fetchall()
-        connect.close()
-        return result
-    else:
-        cursor.execute(request, params)
-        connect.commit()
-        connect.close()
-
-def save_courses(data):
+def save_groups(data):
     for course, groups in data.items():
         if course == 'complex':
             continue
@@ -40,9 +22,9 @@ def save_courses(data):
             date, time = now_time()  # Обновляем время для каждой группы
             timestamp = f"{date} {time}"
             SQL_request("""
-                INSERT INTO groups (complex, name, url, course, time_add)
+                INSERT INTO groups (complex, group_name, url, course, time_add)
                 VALUES (?, ?, ?, ?, ?)
-                ON CONFLICT(name) DO UPDATE SET
+                ON CONFLICT(group_name) DO UPDATE SET
                     complex = excluded.complex,
                     url = excluded.url,
                     course = excluded.course,
@@ -56,7 +38,7 @@ def save_schedule(data):
     del new_data["week"]
     del new_data["group"]
     group = group.replace("-", "_")
-    create_db.create_group(group)
+    create_group(group)
     data = new_data
     date, time = now_time()  # Обновляем время для каждой группы
     timestamp = f"{date} {time}"
@@ -69,5 +51,24 @@ def save_schedule(data):
     """, (week, json.dumps(data), timestamp))
 
 
-
-import create_db
+def find_groups(find_group=None):
+    groups = SQL_request("SELECT * FROM groups", all_data=True)
+    if groups:
+        groups_list = {}
+        for group in groups:
+            group_dict = {
+                "id": group[0],
+                "complex": group[1],
+                "url": group[3],
+                "course": group[4]
+            }
+            groups_list[group[2]] = (group_dict)
+        try:
+            if find_group:
+                groups_list = groups_list[find_group]
+        except:
+            return "Группа не найдена", 400
+        groups_json = json.dumps(groups_list, indent=4, ensure_ascii=False)
+        return groups_json, 200
+    else:
+        return None, 400
