@@ -14,6 +14,13 @@ def now_time():  # Получение текущего времени по МС�
     current_date = now_moscow.strftime("%Y.%m.%d")
     return current_date, current_time
 
+def now_week():
+    now = datetime.now()
+    tz = pytz.timezone('Europe/Moscow')
+    now_moscow = now.astimezone(tz)
+    week_number = now_moscow.isocalendar()[1]  # Получаем номер недели
+    return week_number
+
 def save_groups(data):
     for course, groups in data.items():
         if course == 'complex':
@@ -72,3 +79,17 @@ def find_groups(find_group=None):
         return groups_json, 200
     else:
         return None, 400
+
+def find_schedule(group, week=None):
+    group = group.replace("-", "_")
+    if week is None:
+        week = now_week()
+    try:
+        data = SQL_request(f"SELECT * FROM '{group}' WHERE week={week}", all_data=True)
+        schedule = {}
+        schedule["week"] = data[0][0]
+        schedule["schedule"] = data[0][1]
+    except Exception as e:
+        print(e)
+        return "Расписание не найдено", 400
+    return schedule, 200

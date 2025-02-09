@@ -55,6 +55,18 @@ def get_groups():
     groups, code = find_groups(group)
     return jsonify(groups), code
 
+@Blueprint.route('get_schedule', methods=['POST'])
+def get_schedule():
+    if request.method == "GET":
+        return "Используйте POST запрос", 405
+    elif request.method == "POST":
+        data = request.get_json()
+        group = data['group']
+        week = data.get("week")
+        print(week)
+    schedule, code = find_schedule(group, week)
+    return jsonify(schedule), code
+
 
 if __name__ == '__main__':
     app = Flask(__name__)
