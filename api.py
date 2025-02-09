@@ -2,7 +2,7 @@ from flask import Flask, jsonify, Blueprint, request, abort
 import config
 from scripts import *
 
-VERSION = "1.0.0"
+VERSION = "1.0.1"
 
 Blueprint = Blueprint(
     "api",
@@ -65,7 +65,6 @@ def get_schedule():
         data = request.get_json()
         group = data['group']
         week = data.get("week")
-        print(week)
     schedule, code = find_schedule(group, week)
     return jsonify(schedule), code
 
