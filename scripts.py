@@ -55,7 +55,7 @@ def save_schedule(data):
         ON CONFLICT(week) DO UPDATE SET
             week = excluded.week,
             time_add = excluded.time_add
-    """, (week, json.dumps(data), timestamp))
+    """, (week, data, timestamp))
 
 
 def find_groups(find_group=None):
