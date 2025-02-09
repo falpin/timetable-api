@@ -34,6 +34,5 @@ def create_group(group):
         data JSON,
         time_add DATETIME DEFAULT CURRENT_TIMESTAMP
     )""")
-    print(f"Группа {group} создана")
 
 create_groups()

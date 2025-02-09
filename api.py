@@ -73,4 +73,4 @@ def get_schedule():
 if __name__ == '__main__':
     app = Flask(__name__)
     app.register_blueprint(Blueprint)
-    app.run(port=80, host="0.0.0.0")
+    app.run(port=80, debug=True)

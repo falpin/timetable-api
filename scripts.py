@@ -55,7 +55,7 @@ def save_schedule(data):
         ON CONFLICT(week) DO UPDATE SET
             week = excluded.week,
             time_add = excluded.time_add
-    """, (week, data, timestamp))
+    """, (week, json.dumps(data), timestamp))
 
 
 def find_groups(find_group=None):
@@ -76,7 +76,7 @@ def find_groups(find_group=None):
         except:
             return "Группа не найдена", 400
         groups_json = json.dumps(groups_list, indent=4, ensure_ascii=False)
-        return groups_json, 200
+        return groups_list, 200
     else:
         return None, 400
 
@@ -88,8 +88,7 @@ def find_schedule(group, week=None):
         data = SQL_request(f"SELECT * FROM '{group}' WHERE week={week}", all_data=True)
         schedule = {}
         schedule["week"] = data[0][0]
-        schedule["schedule"] = data[0][1]
+        schedule["schedule"] = json.loads(data[0][1])
     except Exception as e:
-        print(e)
         return "Расписание не найдено", 400
     return schedule, 200
