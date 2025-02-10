@@ -1,8 +1,10 @@
 from flask import Flask, jsonify, Blueprint, request, abort
 import config
 from scripts import *
+from flask_cors import CORS  # Импортируем CORS
+CORS(app)  # Разрешаем CORS для всех доменов
 
-VERSION = "1.1.0"
+VERSION = "1.1.1"
 
 Blueprint = Blueprint(
     "api",
@@ -72,4 +74,4 @@ def get_schedule():
 if __name__ == '__main__':
     app = Flask(__name__)
     app.register_blueprint(Blueprint)
-    app.run(port=80, debug=True)
+    app.run(port=80, debug=False, host="0.0.0.0")
