@@ -38,24 +38,24 @@ def save_groups(data):
                     time_add = excluded.time_add  -- Обновляем время добавления
             """, (data['complex'], group_name, url, course, timestamp))
 
-def save_schedule(data):
-    week = data["week"]
-    group = data["group"]
-    new_data = data.copy()
+def save_schedule(get_data):
+    week = get_data["week"]
+    new_data = get_data.copy()
     del new_data["week"]
-    del new_data["group"]
-    group = group.replace("-", "_")
-    create_group(group)
-    data = new_data
-    date, time = now_time()  # Обновляем время для каждой группы
-    timestamp = f"{date} {time}"
-    SQL_request(f"""
-        INSERT INTO {group} (week, data, time_add)
-        VALUES (?, ?, ?)
-        ON CONFLICT(week) DO UPDATE SET
-            week = excluded.week,
-            time_add = excluded.time_add
-    """, (week, json.dumps(data), timestamp))
+    get_data = new_data
+    for group in get_data:
+        data = get_data[group]
+        group = group.replace("-", "_")
+        create_group(group)
+        date, time = now_time()  # Обновляем время для каждой группы
+        timestamp = f"{date} {time}"
+        SQL_request(f"""
+            INSERT INTO {group} (week, data, time_add)
+            VALUES (?, ?, ?)
+            ON CONFLICT(week) DO UPDATE SET
+                week = excluded.week,
+                time_add = excluded.time_add
+        """, (week, json.dumps(data), timestamp))
 
 
 def find_groups(find_group=None):
