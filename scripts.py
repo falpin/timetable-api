@@ -53,7 +53,7 @@ def save_schedule(get_data):
             INSERT INTO {group} (week, data, time_add)
             VALUES (?, ?, ?)
             ON CONFLICT(week) DO UPDATE SET
-                week = excluded.week,
+                data = excluded.data,
                 time_add = excluded.time_add
         """, (week, json.dumps(data), timestamp))
 
