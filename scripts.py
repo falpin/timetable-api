@@ -42,7 +42,6 @@ def save_schedule(get_data):
     week = get_data["week"]
     new_data = get_data.copy()
     del new_data["week"]
-    del new_data["group"]
     get_data = new_data
     for group in get_data:
         data = get_data[group]
